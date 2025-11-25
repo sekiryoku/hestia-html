@@ -162,30 +162,4 @@ echo "Username: $USERNAME"
 echo "Password: $PASSWORD"
 echo "============================================================"
 
-# ==============================
-#  Патчим шаблоны Nginx
-# ==============================
-echo "⚙️  Вношу изменения в шаблоны Hestia (default.tpl и default.stpl)..."
-TEMPLATE_DIR="/usr/local/hestia/data/templates/web/nginx/php-fpm"
-
-for FILE in "$TEMPLATE_DIR/default.tpl" "$TEMPLATE_DIR/default.stpl"; do
-  if [ -f "$FILE" ]; then
-    cp "$FILE" "${FILE}.bak_$(date +%F_%H-%M-%S)"
-    if grep -q "try_files \$uri \$uri/ /index.html;" "$FILE"; then
-      echo "⚠️  В $FILE строка уже существует, пропускаю."
-    else
-      sed -i '/location \/ {/a\    try_files $uri $uri/ /index.html;' "$FILE"
-    fi
-  else
-    echo "❌ Файл $FILE не найден!"
-  fi
-done
-
-echo "🔍 Проверка конфигурации Nginx..."
-if nginx -t; then
-  echo "✅ Конфигурация Nginx корректна."
-else
-  echo "⚠️ ВНИМАНИЕ: возможна ошибка в шаблоне. Проверь вручную!"
-fi
-
 echo "🏁 Скрипт завершён!"
